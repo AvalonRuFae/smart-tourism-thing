@@ -1,0 +1,327 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-09-24",
+  "description": "Configuration file for Hong Kong tourist attractions. Edit this file to add/modify attractions for the tourism planning system.",
+  "instructions": {
+    "howToAdd": "Add new attractions to the 'attractions' array following the exact schema format",
+    "categories": ["nature", "cultural", "entertainment", "shopping", "food", "historical", "adventure", "religious", "museum", "nightlife"],
+    "priceRanges": ["free", "low", "medium", "high"],
+    "coordinateFormat": "Use decimal degrees format (e.g., 22.2705 for latitude, 114.1505 for longitude)",
+    "timeFormat": "Use 24-hour format (e.g., '09:00', '18:00')",
+    "estimatedVisitTime": "Time in minutes for a typical visit"
+  },
+  "schema": {
+    "attraction": {
+      "id": "string (unique identifier)",
+      "name": "string (attraction name)",
+      "description": "string (brief description)",
+      "location": {
+        "lat": "number (latitude in decimal degrees)",
+        "lng": "number (longitude in decimal degrees)",
+        "address": "string (optional full address)"
+      },
+      "category": "string (one of the categories listed above)",
+      "priceRange": "string (one of: free, low, medium, high)",
+      "rating": "number (1-5 scale with decimals)",
+      "imageUrl": "string (path to image file)",
+      "tags": "array of strings (searchable keywords)",
+      "openingHours": {
+        "monday": { "open": "string", "close": "string", "isClosed": "boolean" },
+        "tuesday": { "open": "string", "close": "string", "isClosed": "boolean" },
+        "wednesday": { "open": "string", "close": "string", "isClosed": "boolean" },
+        "thursday": { "open": "string", "close": "string", "isClosed": "boolean" },
+        "friday": { "open": "string", "close": "string", "isClosed": "boolean" },
+        "saturday": { "open": "string", "close": "string", "isClosed": "boolean" },
+        "sunday": { "open": "string", "close": "string", "isClosed": "boolean" }
+      },
+      "estimatedVisitTime": "number (minutes)",
+      "accessibility": {
+        "wheelchairAccessible": "boolean",
+        "hasElevator": "boolean", 
+        "hasRestrooms": "boolean",
+        "audioGuide": "boolean"
+      }
+    }
+  },
+  "attractions": [
+    {
+      "id": "the-peak",
+      "name": "The Peak",
+      "description": "Iconic mountain offering panoramic views of Hong Kong skyline",
+      "location": { 
+        "lat": 22.2705, 
+        "lng": 114.1505,
+        "address": "The Peak, Hong Kong Island"
+      },
+      "category": "nature",
+      "priceRange": "medium",
+      "rating": 4.8,
+      "imageUrl": "/images/the-peak.jpg",
+      "tags": ["scenic", "viewpoint", "tram", "skyline", "mountain"],
+      "openingHours": {
+        "monday": { "open": "07:00", "close": "24:00", "isClosed": false },
+        "tuesday": { "open": "07:00", "close": "24:00", "isClosed": false },
+        "wednesday": { "open": "07:00", "close": "24:00", "isClosed": false },
+        "thursday": { "open": "07:00", "close": "24:00", "isClosed": false },
+        "friday": { "open": "07:00", "close": "24:00", "isClosed": false },
+        "saturday": { "open": "07:00", "close": "24:00", "isClosed": false },
+        "sunday": { "open": "07:00", "close": "24:00", "isClosed": false }
+      },
+      "estimatedVisitTime": 120,
+      "accessibility": { 
+        "wheelchairAccessible": true, 
+        "hasElevator": true, 
+        "hasRestrooms": true, 
+        "audioGuide": true 
+      }
+    },
+    {
+      "id": "tsim-sha-tsui-promenade",
+      "name": "Tsim Sha Tsui Promenade", 
+      "description": "Waterfront promenade with stunning harbor views and cultural attractions",
+      "location": { 
+        "lat": 22.2952, 
+        "lng": 114.1722,
+        "address": "Tsim Sha Tsui Promenade, Kowloon"
+      },
+      "category": "cultural",
+      "priceRange": "free",
+      "rating": 4.6,
+      "imageUrl": "/images/tsim-sha-tsui.jpg",
+      "tags": ["waterfront", "harbor", "lights", "symphony", "promenade"],
+      "openingHours": {
+        "monday": { "open": "00:00", "close": "23:59", "isClosed": false },
+        "tuesday": { "open": "00:00", "close": "23:59", "isClosed": false },
+        "wednesday": { "open": "00:00", "close": "23:59", "isClosed": false },
+        "thursday": { "open": "00:00", "close": "23:59", "isClosed": false },
+        "friday": { "open": "00:00", "close": "23:59", "isClosed": false },
+        "saturday": { "open": "00:00", "close": "23:59", "isClosed": false },
+        "sunday": { "open": "00:00", "close": "23:59", "isClosed": false }
+      },
+      "estimatedVisitTime": 90,
+      "accessibility": { 
+        "wheelchairAccessible": true, 
+        "hasElevator": false, 
+        "hasRestrooms": true, 
+        "audioGuide": false 
+      }
+    },
+    {
+      "id": "central-district",
+      "name": "Central District",
+      "description": "Hong Kong's main business district with shopping and dining",
+      "location": { 
+        "lat": 22.2855, 
+        "lng": 114.1577,
+        "address": "Central, Hong Kong Island"
+      },
+      "category": "shopping",
+      "priceRange": "high",
+      "rating": 4.5,
+      "imageUrl": "/images/central.jpg",
+      "tags": ["business", "shopping", "ferry", "IFC", "skyscrapers"],
+      "openingHours": {
+        "monday": { "open": "06:00", "close": "23:00", "isClosed": false },
+        "tuesday": { "open": "06:00", "close": "23:00", "isClosed": false },
+        "wednesday": { "open": "06:00", "close": "23:00", "isClosed": false },
+        "thursday": { "open": "06:00", "close": "23:00", "isClosed": false },
+        "friday": { "open": "06:00", "close": "23:00", "isClosed": false },
+        "saturday": { "open": "06:00", "close": "23:00", "isClosed": false },
+        "sunday": { "open": "06:00", "close": "23:00", "isClosed": false }
+      },
+      "estimatedVisitTime": 180,
+      "accessibility": { 
+        "wheelchairAccessible": true, 
+        "hasElevator": true, 
+        "hasRestrooms": true, 
+        "audioGuide": false 
+      }
+    },
+    {
+      "id": "ocean-park",
+      "name": "Ocean Park",
+      "description": "Marine life theme park with thrilling rides and animal exhibits",
+      "location": { 
+        "lat": 22.2461, 
+        "lng": 114.1628,
+        "address": "Aberdeen, Hong Kong Island"
+      },
+      "category": "entertainment",
+      "priceRange": "high",
+      "rating": 4.7,
+      "imageUrl": "/images/ocean-park.jpg",
+      "tags": ["theme park", "pandas", "cable car", "marine life", "rides"],
+      "openingHours": {
+        "monday": { "open": "10:00", "close": "18:00", "isClosed": false },
+        "tuesday": { "open": "10:00", "close": "18:00", "isClosed": false },
+        "wednesday": { "open": "10:00", "close": "18:00", "isClosed": false },
+        "thursday": { "open": "10:00", "close": "18:00", "isClosed": false },
+        "friday": { "open": "10:00", "close": "19:00", "isClosed": false },
+        "saturday": { "open": "10:00", "close": "19:00", "isClosed": false },
+        "sunday": { "open": "10:00", "close": "19:00", "isClosed": false }
+      },
+      "estimatedVisitTime": 360,
+      "accessibility": { 
+        "wheelchairAccessible": true, 
+        "hasElevator": true, 
+        "hasRestrooms": true, 
+        "audioGuide": true 
+      }
+    },
+    {
+      "id": "temple-street-night-market",
+      "name": "Temple Street Night Market",
+      "description": "Famous night market with street food and fortune tellers",
+      "location": { 
+        "lat": 22.3033, 
+        "lng": 114.1714,
+        "address": "Temple Street, Yau Ma Tei, Kowloon"
+      },
+      "category": "food",
+      "priceRange": "low",
+      "rating": 4.4,
+      "imageUrl": "/images/temple-street.jpg",
+      "tags": ["night market", "street food", "fortune telling", "shopping", "local culture"],
+      "openingHours": {
+        "monday": { "open": "18:00", "close": "23:00", "isClosed": false },
+        "tuesday": { "open": "18:00", "close": "23:00", "isClosed": false },
+        "wednesday": { "open": "18:00", "close": "23:00", "isClosed": false },
+        "thursday": { "open": "18:00", "close": "23:00", "isClosed": false },
+        "friday": { "open": "18:00", "close": "23:59", "isClosed": false },
+        "saturday": { "open": "18:00", "close": "23:59", "isClosed": false },
+        "sunday": { "open": "18:00", "close": "23:00", "isClosed": false }
+      },
+      "estimatedVisitTime": 120,
+      "accessibility": { 
+        "wheelchairAccessible": false, 
+        "hasElevator": false, 
+        "hasRestrooms": true, 
+        "audioGuide": false 
+      }
+    },
+    {
+      "id": "wong-tai-sin-temple",
+      "name": "Wong Tai Sin Temple",
+      "description": "Colorful Taoist temple famous for fortune-telling",
+      "location": { 
+        "lat": 22.3431, 
+        "lng": 114.1944,
+        "address": "2 Chuk Yuen Village Rd, Wong Tai Sin, Kowloon"
+      },
+      "category": "religious",
+      "priceRange": "free",
+      "rating": 4.3,
+      "imageUrl": "/images/wong-tai-sin.jpg",
+      "tags": ["temple", "fortune telling", "architecture", "cultural", "spiritual"],
+      "openingHours": {
+        "monday": { "open": "07:00", "close": "17:00", "isClosed": false },
+        "tuesday": { "open": "07:00", "close": "17:00", "isClosed": false },
+        "wednesday": { "open": "07:00", "close": "17:00", "isClosed": false },
+        "thursday": { "open": "07:00", "close": "17:00", "isClosed": false },
+        "friday": { "open": "07:00", "close": "17:00", "isClosed": false },
+        "saturday": { "open": "07:00", "close": "17:00", "isClosed": false },
+        "sunday": { "open": "07:00", "close": "17:00", "isClosed": false }
+      },
+      "estimatedVisitTime": 90,
+      "accessibility": { 
+        "wheelchairAccessible": true, 
+        "hasElevator": false, 
+        "hasRestrooms": true, 
+        "audioGuide": false 
+      }
+    },
+    {
+      "id": "star-ferry-pier",
+      "name": "Star Ferry Pier",
+      "description": "Historic ferry service offering scenic harbor crossings",
+      "location": { 
+        "lat": 22.2945, 
+        "lng": 114.1681,
+        "address": "Star Ferry Pier, Tsim Sha Tsui, Kowloon"
+      },
+      "category": "cultural",
+      "priceRange": "low",
+      "rating": 4.5,
+      "imageUrl": "/images/star-ferry.jpg",
+      "tags": ["ferry", "harbor", "historic", "transportation", "scenic"],
+      "openingHours": {
+        "monday": { "open": "06:30", "close": "23:30", "isClosed": false },
+        "tuesday": { "open": "06:30", "close": "23:30", "isClosed": false },
+        "wednesday": { "open": "06:30", "close": "23:30", "isClosed": false },
+        "thursday": { "open": "06:30", "close": "23:30", "isClosed": false },
+        "friday": { "open": "06:30", "close": "23:30", "isClosed": false },
+        "saturday": { "open": "06:30", "close": "23:30", "isClosed": false },
+        "sunday": { "open": "06:30", "close": "23:30", "isClosed": false }
+      },
+      "estimatedVisitTime": 45,
+      "accessibility": { 
+        "wheelchairAccessible": true, 
+        "hasElevator": false, 
+        "hasRestrooms": true, 
+        "audioGuide": false 
+      }
+    },
+    {
+      "id": "hong-kong-disneyland",
+      "name": "Hong Kong Disneyland",
+      "description": "Magical theme park with classic Disney attractions and shows",
+      "location": { 
+        "lat": 22.3126, 
+        "lng": 114.0411,
+        "address": "Lantau Island, Hong Kong"
+      },
+      "category": "entertainment",
+      "priceRange": "high",
+      "rating": 4.6,
+      "imageUrl": "/images/disneyland.jpg",
+      "tags": ["disney", "theme park", "family", "entertainment", "magic"],
+      "openingHours": {
+        "monday": { "open": "10:00", "close": "20:00", "isClosed": false },
+        "tuesday": { "open": "10:00", "close": "20:00", "isClosed": false },
+        "wednesday": { "open": "10:00", "close": "20:00", "isClosed": false },
+        "thursday": { "open": "10:00", "close": "20:00", "isClosed": false },
+        "friday": { "open": "10:00", "close": "21:00", "isClosed": false },
+        "saturday": { "open": "09:00", "close": "21:00", "isClosed": false },
+        "sunday": { "open": "09:00", "close": "21:00", "isClosed": false }
+      },
+      "estimatedVisitTime": 480,
+      "accessibility": { 
+        "wheelchairAccessible": true, 
+        "hasElevator": true, 
+        "hasRestrooms": true, 
+        "audioGuide": true 
+      }
+    },
+{
+  "id": "victoria-harbour",
+  "name": "Victoria Harbour",
+  "description": "Iconic harbor offering stunning city skyline views and boat tours",
+  "location": { 
+    "lat": 22.2899, 
+    "lng": 114.1655,
+    "address": "Victoria Harbour, Hong Kong"
+  },
+  "category": "nature",
+  "priceRange": "free",
+  "rating": 4.9,
+  "imageUrl": "/images/victoria-harbour.jpg",
+  "tags": ["harbor", "skyline", "photography", "sunset", "iconic"],
+  "openingHours": {
+    "monday": { "open": "00:00", "close": "23:59", "isClosed": false },
+    "tuesday": { "open": "00:00", "close": "23:59", "isClosed": false },
+    "wednesday": { "open": "00:00", "close": "23:59", "isClosed": false },
+    "thursday": { "open": "00:00", "close": "23:59", "isClosed": false },
+    "friday": { "open": "00:00", "close": "23:59", "isClosed": false },
+    "saturday": { "open": "00:00", "close": "23:59", "isClosed": false },
+    "sunday": { "open": "00:00", "close": "23:59", "isClosed": false }
+  },
+  "estimatedVisitTime": 60,
+  "accessibility": { 
+    "wheelchairAccessible": true, 
+    "hasElevator": false, 
+    "hasRestrooms": true, 
+    "audioGuide": false 
+  }
+}
+  ]
+}

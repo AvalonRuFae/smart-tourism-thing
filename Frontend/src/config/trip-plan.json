@@ -1,0 +1,205 @@
+{
+  "tripInfo": {
+    "title": "Hong Kong Day Trip Adventure",
+    "subtitle": "Discover the best of Hong Kong in one unforgettable day",
+    "duration": "Full Day (8 hours)",
+    "difficulty": "Easy to Moderate",
+    "totalCost": "HK$300-500 per person"
+  },
+  "defaultSelectedIndex": 0,
+  "attractions": [
+    {
+      "name": "Victoria Peak (The Peak)",
+      "type": "Scenic Viewpoint",
+      "location": {
+        "lat": 22.2783,
+        "lng": 114.1747,
+        "address": "The Peak, Hong Kong Island"
+      },
+      "timing": {
+        "startTime": "09:00",
+        "duration": 120,
+        "bestVisitTime": "Morning for clearer views"
+      },
+      "transport": {
+        "fromPrevious": "Start of journey",
+        "method": "Peak Tram",
+        "duration": 8,
+        "cost": "HK$37-65",
+        "instructions": "Take Peak Tram from Central. Book online to skip queues."
+      },
+      "highlights": [
+        "360° panoramic views of Hong Kong skyline",
+        "Historical Peak Tram experience (since 1888)",
+        "Sky Terrace 428 observation deck",
+        "Madame Tussauds Hong Kong nearby"
+      ],
+      "description": "Start your Hong Kong adventure at the most iconic viewpoint in the city. The Peak offers breathtaking panoramic views of Victoria Harbour, towering skyscrapers, and the surrounding islands.",
+      "tips": [
+        "Visit early morning for best visibility",
+        "Book Peak Tram tickets online to avoid long queues",
+        "Bring a jacket - it's cooler at the top",
+        "Allow extra time for photos"
+      ],
+      "cost": "HK$37-65 (Peak Tram + Sky Terrace)",
+      "difficulty": "Easy"
+    },
+    {
+      "name": "Dim Sum Lunch in Central",
+      "type": "Dining Experience",
+      "location": {
+        "lat": 22.2783,
+        "lng": 114.1587,
+        "address": "Maxim's Palace, City Hall, Central"
+      },
+      "timing": {
+        "startTime": "11:30",
+        "duration": 90,
+        "bestVisitTime": "11:30 AM - 1:00 PM for fresh selections"
+      },
+      "transport": {
+        "fromPrevious": "Victoria Peak",
+        "method": "Peak Tram + MTR",
+        "duration": 25,
+        "cost": "HK$15",
+        "instructions": "Take Peak Tram down, then Central MTR to Admiralty, walk to City Hall."
+      },
+      "highlights": [
+        "Authentic Cantonese dim sum experience",
+        "Traditional tea culture",
+        "Historic City Hall location",
+        "Wide variety of handmade dumplings"
+      ],
+      "description": "Experience Hong Kong's famous dim sum culture at one of the city's most renowned establishments. Enjoy handcrafted dumplings, buns, and tea in a traditional setting.",
+      "tips": [
+        "Arrive before 12 PM for best selection",
+        "Try har gow (shrimp dumplings) and siu mai",
+        "Order Chinese tea - jasmine or pu-erh recommended",
+        "Don't be shy - point at what looks good on other tables"
+      ],
+      "cost": "HK$150-250 per person",
+      "difficulty": "Easy"
+    },
+    {
+      "name": "Star Ferry Crossing",
+      "type": "Transportation & Experience",
+      "location": {
+        "lat": 22.2946,
+        "lng": 114.1675,
+        "address": "Star Ferry Pier, Tsim Sha Tsui"
+      },
+      "timing": {
+        "startTime": "13:30",
+        "duration": 30,
+        "bestVisitTime": "Afternoon with good lighting"
+      },
+      "transport": {
+        "fromPrevious": "Central",
+        "method": "Star Ferry",
+        "duration": 10,
+        "cost": "HK$3.4",
+        "instructions": "Walk to Star Ferry Pier Central, take ferry to Tsim Sha Tsui."
+      },
+      "highlights": [
+        "Historic ferry service since 1888",
+        "Stunning harbor views during crossing",
+        "Most affordable way to see Victoria Harbour",
+        "Iconic Hong Kong experience"
+      ],
+      "description": "Take the legendary Star Ferry across Victoria Harbour - one of the world's great ferry rides. This historic service offers spectacular views of both sides of the harbour at an unbeatable price.",
+      "tips": [
+        "Sit on the right side for best skyline views",
+        "Keep camera ready - the crossing is short",
+        "Try both upper and lower deck experiences",
+        "Very affordable but cash only"
+      ],
+      "cost": "HK$3.4 (incredible value!)",
+      "difficulty": "Easy"
+    },
+    {
+      "name": "Tsim Sha Tsui Promenade",
+      "type": "Waterfront Walk",
+      "location": {
+        "lat": 22.2947,
+        "lng": 114.1694,
+        "address": "Tsim Sha Tsui Promenade, Kowloon"
+      },
+      "timing": {
+        "startTime": "14:00",
+        "duration": 90,
+        "bestVisitTime": "Late afternoon for perfect lighting"
+      },
+      "transport": {
+        "fromPrevious": "Star Ferry Crossing",
+        "method": "Walking",
+        "duration": 2,
+        "cost": "HK$0",
+        "instructions": "Step off ferry and walk directly to promenade."
+      },
+      "highlights": [
+        "Unobstructed views of Hong Kong Island skyline",
+        "Avenue of Stars honoring Hong Kong cinema",
+        "Clock Tower - historic landmark",
+        "Perfect spot for photography"
+      ],
+      "description": "Stroll along one of the world's most spectacular waterfront promenades. With unobstructed views of Victoria Harbour and the Hong Kong Island skyline, this is the perfect spot for photos and relaxation.",
+      "tips": [
+        "Golden hour (4-6 PM) provides best lighting",
+        "Bring water and comfortable shoes",
+        "Look for Bruce Lee statue and handprints",
+        "Save phone battery for evening light show"
+      ],
+      "cost": "Free",
+      "difficulty": "Easy"
+    },
+    {
+      "name": "Symphony of Lights",
+      "type": "Evening Light Show",
+      "location": {
+        "lat": 22.2947,
+        "lng": 114.1694,
+        "address": "Tsim Sha Tsui Promenade (best viewing spot)"
+      },
+      "timing": {
+        "startTime": "20:00",
+        "duration": 15,
+        "bestVisitTime": "Arrive 15 minutes early for good spots"
+      },
+      "transport": {
+        "fromPrevious": "TST Promenade",
+        "method": "Stay in same location",
+        "duration": 0,
+        "cost": "HK$0",
+        "instructions": "Remain at promenade for evening show."
+      },
+      "highlights": [
+        "World's largest permanent light show",
+        "44 buildings participate in synchronized display",
+        "Narration in multiple languages",
+        "Perfect end to Hong Kong day"
+      ],
+      "description": "Witness the world's largest permanent light and sound show as Hong Kong's skyline comes alive with synchronized lights and music. This nightly spectacle is the perfect finale to your Hong Kong adventure.",
+      "tips": [
+        "Arrive 15-20 minutes early for prime viewing spots",
+        "Bring portable phone charger for photos/videos",
+        "Show happens nightly at 8 PM sharp",
+        "Consider dinner nearby before the show"
+      ],
+      "cost": "Free",
+      "difficulty": "Easy"
+    }
+  ],
+  "routeOptions": {
+    "transportModes": ["walking", "transit", "driving"],
+    "avoidTolls": true,
+    "avoidHighways": false,
+    "optimizeWaypoints": true
+  },
+  "totalStats": {
+    "estimatedCost": "HK$300-500",
+    "totalDuration": "8 hours",
+    "walkingDistance": "3.2 km",
+    "transportTime": "45 minutes",
+    "difficulty": "Easy to Moderate"
+  }
+}

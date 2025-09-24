@@ -1,0 +1,6 @@
+/**
+ * Pages index - Export all page components
+ */
+
+export { default as HomePage } from './HomePage';
+export { default as TripPlanPage } from './TripPlanPage';
