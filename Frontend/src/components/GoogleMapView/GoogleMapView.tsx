@@ -286,10 +286,14 @@ const GoogleMapView: React.FC<GoogleMapViewProps> = ({
             stylers: [{ visibility: 'on' }]
           }
         ],
-        mapTypeControl: true,
-        streetViewControl: true,
-        fullscreenControl: true,
-        zoomControl: true
+        // Remove UI controls for cleaner map view
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+        zoomControl: true, // Keep zoom control for usability
+        scaleControl: false,
+        rotateControl: false,
+        panControl: false
       });
 
       mapInstanceRef.current = map;
@@ -351,7 +355,12 @@ const GoogleMapView: React.FC<GoogleMapViewProps> = ({
 
       // Add click listener
       marker.addListener('click', () => {
-        handleAttractionClick(attraction);
+        try {
+          console.log('🎯 Marker clicked for attraction:', attraction.name);
+          handleAttractionClick(attraction);
+        } catch (error) {
+          console.error('Error handling marker click:', error);
+        }
       });
 
       markersRef.current.push(marker);
@@ -360,12 +369,26 @@ const GoogleMapView: React.FC<GoogleMapViewProps> = ({
 
   // Handle attraction click
   const handleAttractionClick = useCallback(async (attraction: TouristAttraction) => {
-    setInternalSelectedAttraction(attraction);
-    onAttractionSelect?.(attraction);
+    try {
+      console.log('🎯 Pin clicked for:', attraction.name);
+      setInternalSelectedAttraction(attraction);
+      
+      // Only call onAttractionSelect if it's different from current selection
+      if (attraction.id !== internalSelectedAttraction?.id) {
+        onAttractionSelect?.(attraction);
+      }
 
-    // Get transit directions from HK center to attraction
-    if (directionsServiceRef.current && userPreferences) {
-      try {
+      // Zoom to the clicked attraction
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.setCenter({
+          lat: attraction.location.lat,
+          lng: attraction.location.lng
+        });
+        mapInstanceRef.current.setZoom(16); // Closer zoom for better detail
+      }
+
+      // Get transit directions from HK center to attraction
+      if (directionsServiceRef.current && userPreferences) {
         const request: google.maps.DirectionsRequest = {
           origin: HK_CENTER,
           destination: { lat: attraction.location.lat, lng: attraction.location.lng },
@@ -381,13 +404,15 @@ const GoogleMapView: React.FC<GoogleMapViewProps> = ({
           if (status === google.maps.DirectionsStatus.OK && result) {
             directionsRendererRef.current?.setDirections(result);
             setTransitDirections(result);
+          } else {
+            console.warn('Directions request failed:', status);
           }
         });
-      } catch (error) {
-        console.error('Error getting transit directions:', error);
       }
+    } catch (error) {
+      console.error('Error in handleAttractionClick:', error);
     }
-  }, [onAttractionSelect, userPreferences]);
+  }, [onAttractionSelect, userPreferences, internalSelectedAttraction]);
 
   // Toggle traffic layer
   const toggleTraffic = useCallback(() => {
@@ -609,19 +634,44 @@ const GoogleMapView: React.FC<GoogleMapViewProps> = ({
     if (selectedAttraction && mapInstanceRef.current) {
       // Find the marker for this attraction and highlight it
       const attraction = attractions.find(a => a.id === selectedAttraction.id);
-      if (attraction) {
+      if (attraction && attraction.id !== internalSelectedAttraction?.id) {
         // Center map on selected attraction
         mapInstanceRef.current.setCenter({
           lat: attraction.location.lat,
           lng: attraction.location.lng
         });
-        mapInstanceRef.current.setZoom(15);
+        mapInstanceRef.current.setZoom(16); // Consistent zoom level
         
-        // Trigger the click handler to show directions
-        handleAttractionClick(attraction);
+        // Update internal state and show directions without triggering onAttractionSelect
+        setInternalSelectedAttraction(attraction);
+        
+        // Get transit directions without calling the full handleAttractionClick
+        if (directionsServiceRef.current && userPreferences) {
+          try {
+            const request: google.maps.DirectionsRequest = {
+              origin: HK_CENTER,
+              destination: { lat: attraction.location.lat, lng: attraction.location.lng },
+              travelMode: google.maps.TravelMode.TRANSIT,
+              transitOptions: {
+                modes: [google.maps.TransitMode.BUS, google.maps.TransitMode.SUBWAY],
+                routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
+              },
+              unitSystem: google.maps.UnitSystem.METRIC
+            };
+
+            directionsServiceRef.current.route(request, (result, status) => {
+              if (status === google.maps.DirectionsStatus.OK && result) {
+                directionsRendererRef.current?.setDirections(result);
+                setTransitDirections(result);
+              }
+            });
+          } catch (error) {
+            console.error('Error getting transit directions:', error);
+          }
+        }
       }
     }
-  }, [selectedAttraction, attractions, handleAttractionClick]);
+  }, [selectedAttraction, attractions, userPreferences, internalSelectedAttraction]);
 
   // Auto-show demo route after map loads
   useEffect(() => {
