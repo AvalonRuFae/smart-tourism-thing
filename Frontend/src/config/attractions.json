@@ -292,6 +292,37 @@
         "audioGuide": true 
       }
     },
+    {
+      "id": "maxims-palace-dim-sum",
+      "name": "Maxim's Palace Dim Sum",
+      "description": "Traditional Cantonese dim sum restaurant with harbor views and authentic dim sum experience",
+      "location": { 
+        "lat": 22.2975, 
+        "lng": 114.1724,
+        "address": "Shop 2-5, 2/F, City Hall Maxim's Palace, 5-7 Edinburgh Pl, Central"
+      },
+      "category": "food",
+      "priceRange": "medium",
+      "rating": 4.3,
+      "imageUrl": "/images/dim-sum.jpg",
+      "tags": ["dim sum", "cantonese", "traditional", "harbor view", "lunch", "tea", "authentic"],
+      "openingHours": {
+        "monday": { "open": "11:00", "close": "14:30", "isClosed": false },
+        "tuesday": { "open": "11:00", "close": "14:30", "isClosed": false },
+        "wednesday": { "open": "11:00", "close": "14:30", "isClosed": false },
+        "thursday": { "open": "11:00", "close": "14:30", "isClosed": false },
+        "friday": { "open": "11:00", "close": "14:30", "isClosed": false },
+        "saturday": { "open": "10:00", "close": "15:00", "isClosed": false },
+        "sunday": { "open": "10:00", "close": "15:00", "isClosed": false }
+      },
+      "estimatedVisitTime": 90,
+      "accessibility": { 
+        "wheelchairAccessible": true, 
+        "hasElevator": true, 
+        "hasRestrooms": true, 
+        "audioGuide": false 
+      }
+    },
 {
   "id": "victoria-harbour",
   "name": "Victoria Harbour",

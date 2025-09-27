@@ -452,39 +452,60 @@ export const HomePage: React.FC = () => {
     setPreferences(userPreferences);
     
     try {
-      // Simulate API call to get personalized attractions
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('🎯 Getting local AI recommendations for preferences:', userPreferences);
       
-      // In a real app, this would call your backend API
-      console.log('User preferences:', userPreferences);
+      // Call real local AI API to get personalized attractions
+      const { apiService } = await import('../services');
+      const recommendations = await apiService.getRecommendations(userPreferences);
       
-      // For now, we'll use sample data
-      // setAttractions(filteredAttractions);
+      console.log('✅ Received local AI recommendations:', recommendations);
+      
+      // Update attractions display (you can implement state for this later)
+      // setFilteredAttractions(recommendations);
       
     } catch (error) {
-      console.error('Error fetching attractions:', error);
+      console.error('❌ Error fetching local AI recommendations:', error);
+      // Still show sample data on error
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle natural language text analysis
+  // Handle natural language text analysis - NEW: Direct trip planning in single AI call
   const handleTextAnalysis = async (text: string) => {
+    if (isLoading) {
+      console.log('🚨 Request already in progress, ignoring duplicate');
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
-      // Simulate AI text analysis
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      console.log('🚀 Generating direct trip plan from text (single AI call):', text.substring(0, 50) + '...');
       
-      // In a real app, this would call your AI service
-      console.log('Analyzing text:', text);
+      // NEW: Call direct trip planning API with real-time context
+      const { apiService } = await import('../services');
+      const tripPlan = await apiService.generateDirectTripPlan(text, sampleAttractions, realTimeData);
       
-      // Simulate extracting preferences from text
-      // const extractedPreferences = await analyzeUserText(text);
-      // setAttractions(getRecommendations(extractedPreferences));
+      console.log('✅ Direct trip plan generated:', tripPlan);
       
-    } catch (error) {
-      console.error('Error analyzing text:', error);
+      // Set the extracted preferences from the trip plan
+      if (tripPlan.extractedPreferences) {
+        setPreferences(tripPlan.extractedPreferences);
+      }
+      
+      // Navigate to trip plan page with the generated trip plan data (no alert)
+      navigate('/trip-plan', { 
+        state: { 
+          tripPlan: tripPlan,
+          generatedAt: new Date().toISOString(),
+          userInput: text
+        } 
+      });
+      
+    } catch (error: any) {
+      console.error(`❌ Trip planning failed: ${error.message || 'Unknown error'}`);
+      console.error('Trip planning error details:', error);
     } finally {
       setIsLoading(false);
     }
@@ -496,16 +517,35 @@ export const HomePage: React.FC = () => {
     setPreferences(userPreferences);
     
     try {
-      // Simulate processing preferences for trip planning
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('🗺️ Generating trip plan with local AI based on preferences:', userPreferences);
       
-      console.log('Planning trip with preferences:', userPreferences);
+      // Call real local AI service to generate trip plan
+      const { apiService } = await import('../services');
+      // Use direct trip plan API with better timing instead of old preference-based API
+      const userText = `${userPreferences.preferredActivities?.join(', ')} trip with ${userPreferences.budget} budget`;
+      const tripPlan = await apiService.generateDirectTripPlan(userText, sampleAttractions, realTimeData);
       
-      // Navigate to trip plan page
-      navigate('/trip-plan');
+      console.log(`✅ Trip plan generated! Found ${tripPlan.recommendations?.length || 0} recommendations.`);
+      
+      // Navigate to trip plan page with the generated trip plan data (no alert)
+      navigate('/trip-plan', { 
+        state: { 
+          tripPlan: tripPlan,
+          generatedAt: new Date().toISOString(),
+          userPreferences: userPreferences
+        } 
+      });
       
     } catch (error) {
-      console.error('Error planning trip:', error);
+      console.error('⚠️ Error generating trip plan. Check if Ollama is running locally. Using default trip plan.');
+      // Still navigate even on error with basic data  
+      navigate('/trip-plan', { 
+        state: { 
+          error: (error as any)?.message || 'Trip plan generation failed',
+          userPreferences: userPreferences,
+          generatedAt: new Date().toISOString()
+        } 
+      });
     } finally {
       setIsLoading(false);
     }
@@ -741,7 +781,10 @@ export const HomePage: React.FC = () => {
       <LoadingOverlay show={isLoading}>
         <div>
           <div className="spinner" />
-          <p>Planning your perfect Hong Kong experience...</p>
+          <p>🤖 AI is analyzing your request and creating a personalized trip plan...</p>
+          <p style={{ fontSize: '0.9rem', opacity: '0.8', marginTop: '8px' }}>
+            This may take 1-3 minutes for comprehensive planning
+          </p>
         </div>
       </LoadingOverlay>
     </PageContainer>

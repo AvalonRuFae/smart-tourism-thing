@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Plan Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .trip-plan { 
+            margin: 20px 0; 
+            padding: 20px; 
+            background-color: #f8f9fa; 
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        .content {
+            background-color: white; 
+            padding: 15px; 
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+        .info {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #1565c0;
+        }
+        .show-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Trip Plan Display Test</h1>
+    
+    <p>This is a test of how the AI-generated trip plan will look on the TripPlanPage.</p>
+    
+    <div class="trip-plan">
+        <div class="header">
+            <h3 style="margin: 0; color: #2c3e50; font-size: 1.2em;">
+                🤖 AI Generated Trip Plan
+            </h3>
+            <button class="close-btn" onclick="hideTripPlan()">×</button>
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+            <strong>Your Request:</strong> <em>Plan a romantic day trip in Hong Kong for couples</em>
+        </div>
+        
+        <div style="font-size: 0.9em; color: #6c757d; margin-bottom: 15px;">
+            Generated at: 9/27/2025, 1:30:00 AM
+        </div>
+        
+        <div class="content">
+# 🌟 Romantic Hong Kong Day Trip Plan
+
+Based on current weather conditions (partly cloudy, 26°C, light breeze), here's your perfect romantic day:
+
+## Morning (9:00 AM - 12:00 PM)
+### 🌅 Peak Tram & Victoria Peak
+- **Time**: 9:00 AM - 11:30 AM
+- **Cost**: HK$130 per person (Peak Tram + Sky Terrace)
+- **Weather Impact**: Perfect visibility for stunning harbor views
+- **Romantic Tip**: Visit early to avoid crowds and capture golden hour photos
+
+### ☕ Café Deco (Peak)
+- **Time**: 11:30 AM - 12:30 PM
+- **Cost**: HK$200-300 for brunch
+- **Special**: Panoramic harbor views while dining
+
+## Afternoon (12:30 PM - 6:00 PM)
+### 🚢 Star Ferry Crossing
+- **Time**: 1:00 PM - 1:15 PM
+- **Cost**: HK$3.40 per person
+- **Romance Factor**: Historic ferry with vintage charm
+
+### 🎭 Avenue of Stars & Tsim Sha Tsui Promenade
+- **Time**: 1:30 PM - 3:30 PM
+- **Cost**: Free
+- **Activity**: Hand-in-hand walk with skyline views
+
+### 🍰 Afternoon Tea at The Peninsula
+- **Time**: 3:30 PM - 5:30 PM
+- **Cost**: HK$800-1200 for two
+- **Special**: World-famous Rolls Royce afternoon tea service
+
+## Evening (6:00 PM - 10:00 PM)
+### 🌆 Symphony of Lights
+- **Time**: 8:00 PM - 8:15 PM
+- **Location**: Tsim Sha Tsui Waterfront
+- **Cost**: Free
+- **Romance**: Harbor light show with your loved one
+
+### 🍽️ Dinner at Aqua
+- **Time**: 8:30 PM - 10:30 PM
+- **Cost**: HK$1500-2000 for two
+- **View**: 29th floor panoramic harbor views
+
+## Transportation Tips:
+- Use Octopus Card for seamless travel
+- Take taxis in rainy weather (current forecast: low chance)
+- MTR is efficient for longer distances
+
+## Total Estimated Cost: HK$3,000-4,000 for two people
+## Best Photo Spots: Victoria Peak, Star Ferry, Avenue of Stars
+
+Weather is perfect today - partly cloudy skies will provide excellent lighting for photos!
+        </div>
+
+        <div class="info">
+            💡 This plan was generated using real-time weather data and local insights. 
+            You can also explore individual attractions using the interactive map below.
+        </div>
+    </div>
+    
+    <div id="show-button" style="text-align: center; padding: 10px; background-color: #fff3cd; border-radius: 5px; border: 1px solid #ffeaa7; display: none;">
+        <button class="show-btn" onclick="showTripPlan()">
+            🤖 Show AI Generated Trip Plan
+        </button>
+    </div>
+
+    <script>
+        function hideTripPlan() {
+            document.querySelector('.trip-plan').style.display = 'none';
+            document.getElementById('show-button').style.display = 'block';
+        }
+        
+        function showTripPlan() {
+            document.querySelector('.trip-plan').style.display = 'block';
+            document.getElementById('show-button').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

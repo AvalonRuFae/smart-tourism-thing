@@ -241,7 +241,8 @@ export const UserInput: React.FC<UserInputProps> = ({
   });
 
   const handleTextSubmit = () => {
-    if (textInput.trim()) {
+    if (textInput.trim() && !isLoading) {
+      console.log('🚀 User clicked Analyze - submitting request:', textInput.trim());
       onTextAnalysis(textInput.trim());
     }
   };

@@ -13,6 +13,7 @@ const rateLimit = require('express-rate-limit');
 // Import route controllers
 const weatherController = require('./controllers/weatherController');
 const attractionsController = require('./controllers/attractionsController');
+const localAIController = require('./controllers/localAIController');
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -56,6 +57,7 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/weather', weatherController);
 app.use('/api/attractions', attractionsController);
+app.use('/api/local-ai', localAIController);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -78,11 +80,15 @@ app.use((error, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 Hong Kong Tourism API server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`🌤️  Weather API: http://localhost:${PORT}/api/weather/current`);
   console.log(`🏛️  Attractions API: http://localhost:${PORT}/api/attractions`);
+  console.log(`🤖 Local AI API: http://localhost:${PORT}/api/local-ai/health`);
 });
+
+// Set server timeout to handle long AI operations
+server.timeout = 240000; // 4 minutes server timeout
 
 module.exports = app;

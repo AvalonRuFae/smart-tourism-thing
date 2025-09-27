@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Loader } from '@googlemaps/js-api-loader';
 import { theme } from '../styles/theme';
@@ -441,30 +442,148 @@ const LoadingSpinner = styled.div`
 `;
 
 const TripPlanPage: React.FC = () => {
-  const [selectedIndex, setSelectedIndex] = useState<number>(tripPlanConfig.defaultSelectedIndex);
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Get trip plan data from navigation state
+  const tripPlanData = location.state?.tripPlan;
+  const userInput = location.state?.userInput;
+  const userPreferences = location.state?.userPreferences;
+  const generatedAt = location.state?.generatedAt;
+  const error = location.state?.error;
+  
+  // Convert AI trip plan to format compatible with existing UI
+  const getAttractionsData = () => {
+    if (tripPlanData && (tripPlanData.plannedAttractions || tripPlanData.recommendations)) {
+      const attractions = (tripPlanData.plannedAttractions || tripPlanData.recommendations || []).map((item: any, index: number) => {
+        let attraction, startTime, duration;
+        
+        if (tripPlanData.plannedAttractions) {
+          // Text extraction format
+          attraction = item.attraction;
+          // Avoid timezone conversion issues by using the time directly if it's already in HH:MM format
+          if (typeof item.plannedStartTime === 'string' && item.plannedStartTime.match(/^\d{1,2}:\d{2}$/)) {
+            const [hours, minutes] = item.plannedStartTime.split(':');
+            startTime = `${hours.padStart(2, '0')}:${minutes}`;
+          } else {
+            // Only use Date conversion if we have a full datetime
+            startTime = new Date(item.plannedStartTime).toLocaleTimeString('en-US', { 
+              hour: '2-digit', 
+              minute: '2-digit',
+              timeZone: 'Asia/Hong_Kong'  // Ensure we stay in Hong Kong timezone
+            });
+          }
+          duration = attraction.estimatedVisitTime || 120;
+        } else {
+          // JSON format
+          attraction = item;
+          startTime = item.suggestedTime || '09:00';
+          
+          // Clean up any malformed time values and ensure proper format
+          if (startTime && typeof startTime === 'string') {
+            // Remove any extra quotes or malformed characters
+            startTime = startTime.replace(/['"]/g, '').trim();
+            
+            // Ensure it's in HH:MM format
+            if (startTime.match(/^\d{1,2}:\d{2}$/)) {
+              // Valid time format, ensure leading zero for hours if needed
+              const [hours, minutes] = startTime.split(':');
+              startTime = `${hours.padStart(2, '0')}:${minutes}`;
+            } else {
+              // Fallback to default time if format is invalid
+              startTime = '09:00';
+            }
+          }
+          
+          duration = item.duration || attraction.estimatedVisitTime || 120;
+          console.log('🕐 Processing AI attraction:', attraction.name);
+          console.log('   📅 Original suggestedTime:', item.suggestedTime, typeof item.suggestedTime);
+          console.log('   🔧 Cleaned startTime:', startTime, typeof startTime);
+          console.log('   ⏰ Final timing object will have:', startTime);
+        }
+        
+        return {
+          name: attraction.name,
+          type: attraction.category || attraction.type || 'Attraction',
+          location: attraction.location || { lat: 22.3193 + (index * 0.01), lng: 114.1694 + (index * 0.01) },
+          timing: {
+            startTime,
+            duration,
+            bestVisitTime: 'As planned'
+          },
+          transport: {
+            fromPrevious: index === 0 ? 'Start of journey' : 'From previous location',
+            method: 'Public Transport',
+            duration: 15,
+            cost: 'HK$10-30',
+            instructions: 'Use MTR or bus for efficient travel'
+          },
+          cost: item.estimatedCost ? `HK$${item.estimatedCost}` : attraction.priceRange || 'Varies',
+          difficulty: 'Easy',
+          description: attraction.description || 'AI recommended attraction',
+          highlights: [item.reason || attraction.aiRecommendation?.reason || 'Recommended by AI'],
+          tips: ['Follow AI recommendations', 'Check real-time conditions']
+        };
+      });
+      
+      return {
+        tripInfo: {
+          title: tripPlanData.name || userInput || 'AI Generated Trip Plan',
+          subtitle: tripPlanData.description || 'Personalized itinerary based on your preferences',
+          duration: `${attractions.length} stops`,
+          difficulty: 'Easy to Moderate',
+          totalCost: `HK$${tripPlanData.totalEstimatedCost || tripPlanData.estimatedCost || 'TBD'}`
+        },
+        attractions
+      };
+    }
+    return tripPlanConfig;
+  };
+  
+  const currentTripData = getAttractionsData();
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [routeInfo, setRouteInfo] = useState<DynamicTransportInfo | null>(null);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
+  const [mapsAvailable, setMapsAvailable] = useState(true);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const directionsRendererRef = useRef<google.maps.DirectionsRenderer | null>(null);
 
-  const selectedAttraction = tripPlanConfig.attractions[selectedIndex] as Attraction;
+  const selectedAttraction = currentTripData.attractions[selectedIndex] as Attraction;
 
   // Initialize Google Maps
   useEffect(() => {
     const initMap = async () => {
       try {
+        const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+        console.log('🗺️ Google Maps API Key loaded:', apiKey ? 'YES' : 'NO');
+        console.log('🗺️ API Key (first 10 chars):', apiKey ? apiKey.substring(0, 10) + '...' : 'MISSING');
+        
+        // Check if API key is available
+        if (!apiKey || apiKey.trim() === '') {
+          console.log('🗺️ Google Maps API key not available - Maps disabled');
+          setMapsAvailable(false);
+          return;
+        }
+        
         const loader = new Loader({
-          apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE',
+          apiKey: apiKey,
           version: 'weekly',
           libraries: ['places', 'geometry']
         });
 
+        console.log('🗺️ Loading Google Maps API...');
         await loader.load();
+        console.log('✅ Google Maps API loaded successfully');
 
         const mapElement = document.getElementById('trip-plan-map');
-        if (!mapElement) return;
+        console.log('🗺️ Map element found:', !!mapElement);
+        if (!mapElement) {
+          console.error('❌ Map element with id "trip-plan-map" not found');
+          return;
+        }
 
+        console.log('🗺️ Creating Google Maps instance...');
         const map = new google.maps.Map(mapElement, {
           center: { lat: 22.3193, lng: 114.1694 },
           zoom: 13,
@@ -478,12 +597,18 @@ const TripPlanPage: React.FC = () => {
           ]
         });
 
+        console.log('✅ Google Maps instance created successfully');
         mapRef.current = map;
         updateMapMarkers();
         updateRoute();
 
-      } catch (error) {
-        console.error('Error loading Google Maps:', error);
+      } catch (error: any) {
+        console.error('❌ Error loading Google Maps:', error);
+        console.error('❌ Error details:', {
+          name: error?.name,
+          message: error?.message,
+          stack: error?.stack
+        });
       }
     };
 
@@ -527,7 +652,7 @@ const TripPlanPage: React.FC = () => {
     }
 
     // Add attraction markers
-    tripPlanConfig.attractions.forEach((attraction, index) => {
+    currentTripData.attractions.forEach((attraction: any, index: number) => {
       const isSelected = index === selectedIndex;
       const isPrevious = index === selectedIndex - 1;
       
@@ -584,7 +709,7 @@ const TripPlanPage: React.FC = () => {
     });
 
     // Auto-center map on selected attraction
-    const selectedAttraction = tripPlanConfig.attractions[selectedIndex];
+    const selectedAttraction = currentTripData.attractions[selectedIndex];
     if (selectedAttraction && mapRef.current) {
       mapRef.current.panTo({ 
         lat: selectedAttraction.location.lat, 
@@ -631,7 +756,7 @@ const TripPlanPage: React.FC = () => {
     directionsRendererRef.current = directionsRenderer;
 
     // Get current attraction and calculate route from previous location
-    const currentAttraction = tripPlanConfig.attractions[selectedIndex];
+    const currentAttraction = currentTripData.attractions[selectedIndex];
     
     if (selectedIndex === 0) {
       // For first attraction, show route from Hong Kong Central
@@ -639,7 +764,7 @@ const TripPlanPage: React.FC = () => {
       calculateAndDisplayRoute(directionsService, directionsRenderer, hkCentral, currentAttraction.location);
     } else {
       // Show route from previous attraction
-      const previousAttraction = tripPlanConfig.attractions[selectedIndex - 1];
+      const previousAttraction = currentTripData.attractions[selectedIndex - 1];
       calculateAndDisplayRoute(directionsService, directionsRenderer, previousAttraction.location, currentAttraction.location);
     }
   };
@@ -769,14 +894,14 @@ const TripPlanPage: React.FC = () => {
             ← Back to Home
           </BackButton>
           <TitleSection>
-            <Title>{tripPlanConfig.tripInfo.title}</Title>
-            <Subtitle>{tripPlanConfig.tripInfo.subtitle}</Subtitle>
+            <Title>{currentTripData.tripInfo.title}</Title>
+            <Subtitle>{currentTripData.tripInfo.subtitle}</Subtitle>
           </TitleSection>
           <div style={{ width: '120px' }}></div>
         </HeaderRow>
 
         <AttractionSelector>
-          {tripPlanConfig.attractions.map((attraction, index) => (
+          {currentTripData.attractions.map((attraction: any, index: number) => (
             <AttractionTab
               key={index}
               isActive={index === selectedIndex}
@@ -788,10 +913,31 @@ const TripPlanPage: React.FC = () => {
         </AttractionSelector>
       </Header>
 
+
+
       <MainContent>
         {/* Map Section */}
         <TripMapContainer>
-          <div id="trip-plan-map" style={{ width: '100%', height: '100%' }} />
+          {mapsAvailable ? (
+            <div id="trip-plan-map" style={{ width: '100%', height: '100%' }} />
+          ) : (
+            <div style={{ 
+              width: '100%', 
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: '#f5f5f5',
+              borderRadius: '8px',
+              border: '2px dashed #ccc'
+            }}>
+              <div style={{ textAlign: 'center', color: '#666' }}>
+                <h3>🗺️ Google Maps Disabled</h3>
+                <p>API key not configured in .env file</p>
+                <p style={{ fontSize: '14px', marginTop: '10px' }}>Add REACT_APP_GOOGLE_MAPS_API_KEY to enable maps</p>
+              </div>
+            </div>
+          )}
         </TripMapContainer>
 
         {/* Attraction Details Slider */}
@@ -869,7 +1015,7 @@ const TripPlanPage: React.FC = () => {
                   <TransportGrid>
                     <InfoItem>
                       <InfoLabel>From</InfoLabel>
-                      <InfoValue>{selectedIndex === 0 ? 'Hong Kong Central' : tripPlanConfig.attractions[selectedIndex - 1].name}</InfoValue>
+                      <InfoValue>{selectedIndex === 0 ? 'Hong Kong Central' : currentTripData.attractions[selectedIndex - 1].name}</InfoValue>
                     </InfoItem>
                     <InfoItem>
                       <InfoLabel>Method</InfoLabel>
@@ -923,7 +1069,7 @@ const TripPlanPage: React.FC = () => {
             Click any step to view details. Current selection: <strong>Step {selectedIndex}</strong>
           </p>
           <RouteSteps>
-            {tripPlanConfig.attractions.map((attraction, index) => (
+            {currentTripData.attractions.map((attraction: any, index: number) => (
               <RouteStep
                 key={index}
                 isActive={index === selectedIndex}

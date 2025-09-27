@@ -27,7 +27,7 @@ class ApiService {
   constructor() {
     this.api = axios.create({
       baseURL: API_BASE_URL,
-      timeout: 10000,
+      timeout: 210000, // 3.5 minutes for comprehensive local AI processing
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -170,40 +170,97 @@ class ApiService {
     }
   }
 
-  // AI Services
+  // Local AI Services
   async analyzeUserText(text: string): Promise<UserPreferences> {
     try {
-      const response = await this.api.post<ApiResponse<UserPreferences>>('/ai/analyze-text', {
+      console.log('🚀 Sending text to local AI:', text.substring(0, 50) + '...');
+      console.log('🔗 API URL:', `${this.api.defaults.baseURL}/local-ai/analyze-text`);
+      
+      const response = await this.api.post<ApiResponse<any>>('/local-ai/analyze-text', {
         text
       });
-      return response.data.data;
-    } catch (error) {
-      console.error('Error analyzing user text:', error);
+      
+      console.log('✅ Local AI response received:', response.data);
+      return response.data.data.extractedPreferences;
+    } catch (error: any) {
+      console.error('❌ Error analyzing user text with local AI:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        url: error.config?.url
+      });
       throw error;
     }
   }
 
   async getRecommendations(preferences: UserPreferences): Promise<TouristAttraction[]> {
     try {
-      const response = await this.api.post<ApiResponse<TouristAttraction[]>>('/ai/recommendations', {
+      const response = await this.api.post<ApiResponse<any>>('/local-ai/recommendations', {
         preferences
       });
-      return response.data.data;
+      return response.data.data.recommendations;
     } catch (error) {
-      console.error('Error getting recommendations:', error);
+      console.error('Error getting recommendations from local AI:', error);
       throw error;
     }
   }
 
-  // Trip Planning Services
+  // Trip Planning Services (using Local AI)
   async createTripPlan(preferences: UserPreferences): Promise<TripPlan> {
     try {
-      const response = await this.api.post<ApiResponse<TripPlan>>('/trips/create', {
+      const response = await this.api.post<ApiResponse<any>>('/local-ai/trip-plan', {
         preferences
       });
       return response.data.data;
     } catch (error) {
-      console.error('Error creating trip plan:', error);
+      console.error('Error creating trip plan with local AI:', error);
+      throw error;
+    }
+  }
+
+  async generateTripPlan(preferences: UserPreferences, attractions: TouristAttraction[]): Promise<any> {
+    try {
+      const response = await this.api.post<ApiResponse<any>>('/local-ai/trip-plan', {
+        preferences,
+        attractions
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error('Error generating trip plan with local AI:', error);
+      throw error;
+    }
+  }
+
+  // Direct Trip Planning - Single AI call from text to complete plan
+  async generateDirectTripPlan(userText: string, attractions?: TouristAttraction[], realTimeData?: any): Promise<any> {
+    try {
+      console.log('🚀 Calling direct trip plan API with text:', userText.substring(0, 50) + '...');
+      console.log('🌤️ Including real-time context:', {
+        weather: realTimeData?.weather?.weatherCondition,
+        temperature: realTimeData?.weather?.temperature,
+        alerts: realTimeData?.alerts?.length || 0
+      });
+      
+      const response = await this.api.post<ApiResponse<any>>('/local-ai/direct-plan', {
+        text: userText,
+        attractions,
+        realTimeData: realTimeData
+      }, {
+        timeout: 200000 // 3.3 minutes for direct trip planning (longer than backend to avoid frontend timeout)
+      });
+      
+      console.log('✅ Direct trip plan response:', response.data);
+      return response.data.data;
+    } catch (error: any) {
+      console.error('❌ Error generating direct trip plan:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      });
       throw error;
     }
   }

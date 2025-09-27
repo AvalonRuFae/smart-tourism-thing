@@ -264,8 +264,17 @@ const GoogleMapView: React.FC<GoogleMapViewProps> = ({
   // Initialize Google Maps
   const initializeMap = useCallback(async () => {
     try {
+      const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+      
+      // Check if API key is available
+      if (!apiKey || apiKey.trim() === '') {
+        console.log('🗺️ Google Maps API key not available - Maps disabled');
+        setIsLoading(false);
+        return;
+      }
+      
       const loader = new Loader({
-        apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE',
+        apiKey: apiKey,
         version: 'weekly',
         libraries: ['places', 'geometry']
       });
@@ -681,6 +690,30 @@ const GoogleMapView: React.FC<GoogleMapViewProps> = ({
       }, 2000); // Show demo route after 2 seconds
     }
   }, [isLoading, showDemoRoute]);
+
+  // Check if API key is available for rendering
+  const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+  if (!apiKey || apiKey.trim() === '') {
+    return (
+      <div className={className} style={{ 
+        position: 'relative', 
+        width: '100%', 
+        height: '500px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#f5f5f5',
+        borderRadius: '8px',
+        border: '2px dashed #ccc'
+      }}>
+        <div style={{ textAlign: 'center', color: '#666' }}>
+          <h3>🗺️ Google Maps Disabled</h3>
+          <p>API key not configured in .env file</p>
+          <p style={{ fontSize: '14px', marginTop: '10px' }}>Add REACT_APP_GOOGLE_MAPS_API_KEY to enable maps</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={className} style={{ position: 'relative', width: '100%', height: '500px' }}>
