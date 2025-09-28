@@ -4,6 +4,7 @@
  */
 
 const axios = require('axios');
+const trafficService = require('./trafficService');
 
 class LocalAIService {
   constructor() {
@@ -366,10 +367,23 @@ Respond with only the JSON array:`;
     try {
       if (!this.isAvailable) {
         console.log('🔄 Ollama not available, using direct fallback trip plan');
-        return this.getDirectFallbackTripPlan(userText, availableAttractions, realTimeData);
+        // Fetch traffic data even for fallback to improve scheduling
+        const trafficData = await trafficService.getTrafficMatrix(availableAttractions);
+        const enhancedRealTimeData = { ...realTimeData, traffic: trafficData };
+        return this.getDirectFallbackTripPlan(userText, availableAttractions, enhancedRealTimeData);
       }
 
-      const prompt = this.createDirectTripPlanPrompt(userText, availableAttractions, realTimeData);
+      // Fetch traffic data for AI consideration
+      console.log('🚗 Fetching traffic conditions for AI analysis...');
+      const trafficData = await trafficService.getTrafficMatrix(availableAttractions);
+      
+      // Add traffic data to realTimeData for fallback function
+      const enhancedRealTimeData = {
+        ...realTimeData,
+        traffic: trafficData
+      };
+
+      const prompt = this.createDirectTripPlanPrompt(userText, availableAttractions, enhancedRealTimeData, trafficData);
       console.log('🎯 Generating complete trip plan with single AI call...');
       
       const response = await axios.post(`${this.ollamaEndpoint}/api/generate`, {
@@ -499,7 +513,7 @@ Respond with only the JSON array:`;
         
         try {
           const tripPlan = JSON.parse(jsonStr);
-          return this.processDirectTripPlan(tripPlan, userText, availableAttractions);
+          return this.processDirectTripPlan(tripPlan, userText, availableAttractions, trafficData);
         } catch (parseError) {
           console.error('❌ JSON Parse Error after cleaning:', parseError.message);
           console.error('❌ Problematic JSON (first 1000 chars):', jsonStr.substring(0, 1000));
@@ -519,14 +533,17 @@ Respond with only the JSON array:`;
 
     } catch (error) {
       console.error('❌ Direct AI Trip Planning Error:', error.message);
-      return this.getDirectFallbackTripPlan(userText, availableAttractions, realTimeData);
+      // Fetch traffic data for fallback scheduling
+      const trafficData = await trafficService.getTrafficMatrix(availableAttractions);
+      const enhancedRealTimeData = { ...realTimeData, traffic: trafficData };
+      return this.getDirectFallbackTripPlan(userText, availableAttractions, enhancedRealTimeData);
     }
   }
 
   /**
    * Create prompt for direct trip planning from user text
    */
-  createDirectTripPlanPrompt(userText, attractions, realTimeData = null) {
+  createDirectTripPlanPrompt(userText, attractions, realTimeData = null, trafficData = null) {
     const attractionsList = attractions.slice(0, 15).map(a => 
       `${a.id}: ${a.name} - ${a.description} (${a.category}, ${a.priceRange}, ${a.estimatedVisitTime}min)`
     ).join('\n');
@@ -558,8 +575,16 @@ Transportation Recommendations:
 
     const firstFewAttractions = attractionsList.split('\n').slice(0, 8).join('\n'); // Only first 8 attractions for speed
     
+    // Add traffic information if available
+    let trafficSection = '';
+    if (trafficData) {
+      trafficSection = trafficService.generateTrafficSummary(trafficData);
+    }
+    
     return `Create Hong Kong trip plan for: "${userText}"
 ${contextSection}
+${trafficSection}
+
 Available attractions:
 ${firstFewAttractions}
 
@@ -696,20 +721,60 @@ Rules:
   /**
    * Process and validate direct trip plan
    */
-  processDirectTripPlan(aiTripPlan, userText, availableAttractions) {
+  processDirectTripPlan(aiTripPlan, userText, availableAttractions, trafficData = null) {
     // Create proper TripPlan structure
     const today = new Date();
     
-    // Create planned attractions from AI selection
+    // Create planned attractions from AI selection with traffic-aware scheduling
+    let currentTime = 9; // Start at 9:00 AM
     const plannedAttractions = (aiTripPlan.selectedAttractions || []).map((selected, index) => {
       const attraction = availableAttractions.find(a => a.id === selected.attractionId) || availableAttractions[0];
       
+      // Use traffic-aware start time for attractions after the first one
+      let startTimeStr;
+      if (index === 0) {
+        startTimeStr = selected.suggestedTime || '09:00';
+        const [hours, minutes] = startTimeStr.split(':');
+        currentTime = parseInt(hours) + parseInt(minutes) / 60;
+      } else {
+        // Calculate start time based on previous attraction + duration + traffic time
+        const hours = Math.floor(currentTime);
+        const minutes = Math.round((currentTime % 1) * 60);
+        startTimeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      }
+      
       const startTime = new Date();
-      const [hours, minutes] = (selected.suggestedTime || '09:00').split(':');
+      const [hours, minutes] = startTimeStr.split(':');
       startTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
       
+      const duration = selected.duration || attraction.estimatedVisitTime || 120;
       const endTime = new Date(startTime);
-      endTime.setMinutes(endTime.getMinutes() + (selected.duration || attraction.estimatedVisitTime || 120));
+      endTime.setMinutes(endTime.getMinutes() + duration);
+
+      // Calculate travel time to next attraction using traffic data
+      const nextIndex = index + 1;
+      if (nextIndex < aiTripPlan.selectedAttractions.length) {
+        const nextAttraction = availableAttractions.find(a => 
+          a.id === aiTripPlan.selectedAttractions[nextIndex].attractionId
+        );
+        
+        let travelTimeMinutes = 90; // Default 1.5 hours
+        
+        if (trafficData && attraction && nextAttraction) {
+          const trafficTime = trafficService.getTrafficTime(
+            trafficData,
+            attraction.name,
+            nextAttraction.name
+          );
+          if (trafficTime > 0) {
+            travelTimeMinutes = trafficTime;
+            console.log(`🚗 Traffic-aware travel time from ${attraction.name} to ${nextAttraction.name}: ${trafficTime} minutes`);
+          }
+        }
+        
+        // Update current time for next attraction: current end + travel time
+        currentTime += (duration / 60) + (travelTimeMinutes / 60);
+      }
 
       return {
         attraction: {
@@ -720,12 +785,12 @@ Rules:
             priority: index + 1
           }
         },
-        plannedStartTime: selected.suggestedTime || '09:00', // Send as string in HH:MM format
+        plannedStartTime: startTimeStr, // Send as string in HH:MM format
         plannedEndTime: endTime,
         estimatedCost: this.getPriceEstimate(attraction.priceRange),
         priority: selected.visitOrder || (index + 1),
-        suggestedTime: selected.suggestedTime || '09:00', // Also add as suggestedTime for compatibility
-        startTime: selected.suggestedTime || '09:00'      // Multiple formats for compatibility
+        suggestedTime: startTimeStr, // Also add as suggestedTime for compatibility
+        startTime: startTimeStr      // Multiple formats for compatibility
       };
     });
 
@@ -880,8 +945,26 @@ Rules:
       const endTime = new Date(startTime);
       endTime.setMinutes(endTime.getMinutes() + visitDuration);
       
-      // Add travel time and break (30-60 minutes) for next attraction
-      currentTime += (visitDuration / 60) + (index < selectedAttractions.length - 1 ? 1.5 : 0);
+      // Add travel time and break (30-60 minutes) for next attraction - traffic-aware
+      if (index < selectedAttractions.length - 1) {
+        const nextAttraction = selectedAttractions[index + 1];
+        let travelTimeHours = 1.5; // Default 1.5 hours
+        
+        // Try to get traffic-aware travel time if available
+        if (realTimeData && realTimeData.traffic) {
+          const trafficTime = trafficService.getTrafficTime(
+            realTimeData.traffic,
+            attraction.name,
+            nextAttraction.name
+          );
+          if (trafficTime > 0) {
+            travelTimeHours = trafficTime / 60; // Convert minutes to hours
+            console.log(`🚗 Using traffic time: ${attraction.name} → ${nextAttraction.name} = ${trafficTime} minutes`);
+          }
+        }
+        
+        currentTime += (visitDuration / 60) + travelTimeHours;
+      }
 
       return {
         attraction: {

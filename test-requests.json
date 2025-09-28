@@ -1,0 +1,17 @@
+{
+  "test1": {
+    "userText": "I want to explore Hong Kong temples and museums for a cultural half-day experience, preferably including traditional architecture and historical artifacts"
+  },
+  "test2": {
+    "userText": "Looking for outdoor activities and nature spots in Hong Kong, maybe hiking and scenic views for a full day adventure"
+  },
+  "test3": {
+    "userText": "Family trip with kids to Hong Kong, need fun attractions, theme parks, and family-friendly restaurants for 2 days"
+  },
+  "test4": {
+    "userText": "Budget backpacker trip to Hong Kong, looking for cheap eats, free attractions, and street markets for 3 days under 500 HKD"
+  },
+  "test5": {
+    "userText": "Luxury shopping and fine dining experience in Hong Kong, high-end malls, michelin restaurants for 1 day unlimited budget"
+  }
+}
