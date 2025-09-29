@@ -138,11 +138,19 @@ const Subtitle = styled.p`
 
 const AttractionSelector = styled.div`
 	display: flex;
-	gap: ${theme.spacing.sm};
+	gap: max(
+		8px,
+		${theme.spacing.sm}
+	); /* Minimum 8px gap to prevent cramped layout */
 	margin-bottom: ${theme.spacing.xl};
 	overflow-x: auto;
 	padding: ${theme.spacing.sm} 0;
 	justify-content: center;
+
+	/* Responsive gap adjustments */
+	@media (max-width: ${theme.breakpoints.sm}) {
+		gap: 8px; /* Fixed 8px gap for small screens to ensure readability */
+	}
 
 	&::-webkit-scrollbar {
 		height: 6px;
@@ -294,7 +302,10 @@ const SliderContent = styled(FlexibleContent)`
 const QuickInfoGrid = styled(FlexibleContent)`
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-	gap: ${theme.spacing.md};
+	gap: max(
+		8px,
+		${theme.spacing.md}
+	); /* Minimum 8px gap to prevent cramped layout */
 	margin-bottom: ${theme.spacing.lg};
 	padding: ${theme.spacing.md};
 	background: ${theme.colors.background};
@@ -306,8 +317,13 @@ const QuickInfoGrid = styled(FlexibleContent)`
 	/* Responsive grid adjustments */
 	@media (max-width: ${theme.breakpoints.sm}) {
 		grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-		gap: ${theme.spacing.sm};
+		gap: 8px; /* Fixed 8px gap for small screens to ensure readability */
 		padding: ${theme.spacing.sm};
+	}
+
+	@media (max-width: 480px) {
+		grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+		gap: 8px; /* Fixed 8px gap for very small screens to ensure readability */
 	}
 
 	/* Ensure grid items don't overflow */
@@ -329,7 +345,10 @@ const TransportCard = styled(FlexibleContent)`
 const TransportGrid = styled(FlexibleContent)`
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-	gap: ${theme.spacing.md};
+	gap: max(
+		8px,
+		${theme.spacing.md}
+	); /* Minimum 8px gap to prevent cramped layout */
 	margin: ${theme.spacing.md} 0;
 	flex-shrink: 0;
 	min-height: auto;
@@ -338,7 +357,12 @@ const TransportGrid = styled(FlexibleContent)`
 	/* Responsive grid adjustments */
 	@media (max-width: ${theme.breakpoints.sm}) {
 		grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-		gap: ${theme.spacing.sm};
+		gap: 8px; /* Fixed 8px gap for small screens to ensure readability */
+	}
+
+	@media (max-width: 480px) {
+		grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+		gap: 8px; /* Fixed 8px gap for very small screens to ensure readability */
 	}
 
 	/* Ensure grid items don't overflow */
@@ -385,8 +409,25 @@ const Description = styled.p`
 const InfoGrid = styled.div`
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-	gap: ${theme.spacing.md};
+	gap: max(
+		8px,
+		${theme.spacing.md}
+	); /* Minimum 8px gap to prevent cramped layout */
 	margin: ${theme.spacing.lg} 0;
+
+	/* Responsive adjustments with minimum gap enforcement */
+	@media (max-width: ${theme.breakpoints.sm}) {
+		grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+		gap: max(
+			8px,
+			${theme.spacing.sm}
+		); /* Minimum 8px gap even on small screens */
+	}
+
+	@media (max-width: 480px) {
+		grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+		gap: 8px; /* Fixed 8px gap for very small screens to ensure readability */
+	}
 `;
 
 const InfoItem = styled(FlexibleContent)`
@@ -485,11 +526,23 @@ const TransportSection = styled.div`
 const RouteSteps = styled(FlexibleContent)`
 	display: flex;
 	flex-direction: row;
-	gap: ${theme.spacing.md};
+	gap: max(
+		8px,
+		${theme.spacing.md}
+	); /* Minimum 8px gap to prevent cramped layout */
 	overflow-x: auto;
 	overflow-y: hidden;
 	padding: ${theme.spacing.sm} 0;
 	min-height: 120px;
+
+	/* Responsive gap adjustments */
+	@media (max-width: ${theme.breakpoints.sm}) {
+		gap: 8px; /* Fixed 8px gap for small screens to ensure readability */
+	}
+
+	@media (max-width: 480px) {
+		gap: 8px; /* Fixed 8px gap for very small screens to ensure readability */
+	}
 
 	&::-webkit-scrollbar {
 		height: 6px;

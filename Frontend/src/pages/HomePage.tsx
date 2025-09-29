@@ -129,8 +129,8 @@ const DragHandleStyled = styled.div<{ isDragging?: boolean }>`
 		content: "";
 		position: absolute;
 		top: -5px;
-		left: -3px;
-		right: -3px;
+		left: 10px;
+		right: 10px;
 		bottom: -5px;
 		cursor: col-resize;
 	}
