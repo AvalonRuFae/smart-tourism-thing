@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Loader } from "@googlemaps/js-api-loader";
-import { theme } from "../styles/theme";
+import { theme, ResizableContainer, FlexibleContent } from "../styles/theme";
 import { Button } from "../styles/theme";
 import tripPlanConfig from "../config/trip-plan.json";
 
@@ -67,6 +67,18 @@ const PageContainer = styled.div`
 	min-height: 100vh;
 	background: ${theme.colors.background};
 	padding: ${theme.spacing.lg};
+	width: 100%;
+	overflow-x: hidden; /* Prevent horizontal overflow */
+	box-sizing: border-box;
+
+	/* Responsive padding */
+	@media (max-width: ${theme.breakpoints.md}) {
+		padding: ${theme.spacing.md};
+	}
+
+	@media (max-width: ${theme.breakpoints.sm}) {
+		padding: ${theme.spacing.sm};
+	}
 
 	@keyframes spin {
 		0% {
@@ -154,7 +166,7 @@ const AttractionTab = styled.button<{ isActive: boolean }>`
 	border: 2px solid
 		${(props) =>
 			props.isActive ? theme.colors.primary : theme.colors.textLight};
-	border-radius: ${theme.borderRadius.lg};
+	border-radius: ${theme.borderRadius.md};
 	padding: ${theme.spacing.md} ${theme.spacing.lg};
 	cursor: pointer;
 	transition: all 0.3s ease;
@@ -171,26 +183,57 @@ const AttractionTab = styled.button<{ isActive: boolean }>`
 	}
 `;
 
-const MainContent = styled.div`
+const MainContent = styled(ResizableContainer)`
 	max-width: 1400px;
 	margin: 0 auto;
+	flex-direction: column;
+	gap: ${theme.spacing.xl};
+	padding: 0 ${theme.spacing.md};
+
+	/* Ensure proper responsive behavior */
+	@media (max-width: ${theme.breakpoints.sm}) {
+		padding: 0 ${theme.spacing.sm};
+		gap: ${theme.spacing.lg};
+	}
 `;
 
-const TripMapContainer = styled.div`
+const TripMapContainer = styled(FlexibleContent)`
 	background: ${theme.colors.surface};
-	border-radius: ${theme.borderRadius.lg};
+	border-radius: ${theme.borderRadius.inner};
 	overflow: hidden;
 	box-shadow: ${theme.shadows.md};
 	height: 500px;
-	margin-bottom: ${theme.spacing.xl};
+	min-height: 300px;
+	max-height: 600px;
+	flex-shrink: 0;
+	width: 100%;
+
+	/* Responsive height adjustments */
+	@media (max-width: ${theme.breakpoints.md}) {
+		height: 400px;
+		min-height: 250px;
+	}
+
+	@media (max-width: ${theme.breakpoints.sm}) {
+		height: 300px;
+		min-height: 200px;
+	}
 `;
 
-const AttractionSlider = styled.div`
+const AttractionSlider = styled(FlexibleContent)`
 	background: ${theme.colors.surface};
-	border-radius: ${theme.borderRadius.lg};
+	border-radius: ${theme.borderRadius.inner};
 	box-shadow: ${theme.shadows.md};
-	overflow: hidden;
-	margin-bottom: ${theme.spacing.lg};
+	overflow: visible; /* Allow content to be visible */
+	min-height: 200px;
+	width: 100%;
+
+	/* Remove max-height to prevent content cutoff */
+	/* Allow natural content flow */
+
+	@media (max-width: ${theme.breakpoints.sm}) {
+		min-height: 150px;
+	}
 `;
 
 const SliderHeader = styled.div`
@@ -216,55 +259,102 @@ const AttractionBadge = styled.span`
 	font-weight: ${theme.typography.fontWeight.semibold};
 `;
 
-const SliderContent = styled.div`
+const SliderContent = styled(FlexibleContent)`
 	padding: ${theme.spacing.lg};
-	max-height: 400px;
-	overflow-y: auto;
+	overflow: visible; /* Allow content to flow naturally */
+	width: 100%;
 
-	&::-webkit-scrollbar {
-		width: 8px;
+	/* Responsive padding */
+	@media (max-width: ${theme.breakpoints.sm}) {
+		padding: ${theme.spacing.md};
 	}
 
-	&::-webkit-scrollbar-track {
-		background: ${theme.colors.surfaceDark};
-		border-radius: 4px;
-	}
+	/* Only add scrolling if content becomes too tall */
+	&.scrollable {
+		max-height: 60vh;
+		overflow-y: auto;
+		overflow-x: hidden;
 
-	&::-webkit-scrollbar-thumb {
-		background: ${theme.colors.primary};
-		border-radius: 4px;
+		&::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		&::-webkit-scrollbar-track {
+			background: ${theme.colors.surfaceDark};
+			border-radius: 4px;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background: ${theme.colors.primary};
+			border-radius: 4px;
+		}
 	}
 `;
 
-const QuickInfoGrid = styled.div`
+const QuickInfoGrid = styled(FlexibleContent)`
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
 	gap: ${theme.spacing.md};
 	margin-bottom: ${theme.spacing.lg};
 	padding: ${theme.spacing.md};
 	background: ${theme.colors.background};
 	border-radius: ${theme.borderRadius.md};
+	flex-shrink: 0;
+	min-height: auto;
+	width: 100%;
+
+	/* Responsive grid adjustments */
+	@media (max-width: ${theme.breakpoints.sm}) {
+		grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+		gap: ${theme.spacing.sm};
+		padding: ${theme.spacing.sm};
+	}
+
+	/* Ensure grid items don't overflow */
+	> * {
+		min-width: 0;
+		overflow: hidden;
+	}
 `;
 
-const TransportCard = styled.div`
+const TransportCard = styled(FlexibleContent)`
 	background: ${theme.colors.background};
-	border-radius: ${theme.borderRadius.lg};
+	border-radius: ${theme.borderRadius.inner};
 	padding: ${theme.spacing.lg};
 	border-left: 4px solid ${theme.colors.secondary};
+	flex-shrink: 0;
+	min-height: auto;
 `;
 
-const TransportGrid = styled.div`
+const TransportGrid = styled(FlexibleContent)`
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 	gap: ${theme.spacing.md};
 	margin: ${theme.spacing.md} 0;
+	flex-shrink: 0;
+	min-height: auto;
+	width: 100%;
+
+	/* Responsive grid adjustments */
+	@media (max-width: ${theme.breakpoints.sm}) {
+		grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+		gap: ${theme.spacing.sm};
+	}
+
+	/* Ensure grid items don't overflow */
+	> * {
+		min-width: 0;
+		overflow: hidden;
+	}
 `;
 
-const RouteOverview = styled.div`
+const RouteOverview = styled(FlexibleContent)`
 	background: ${theme.colors.surface};
-	border-radius: ${theme.borderRadius.lg};
+	border-radius: ${theme.borderRadius.inner};
 	padding: ${theme.spacing.lg};
 	box-shadow: ${theme.shadows.md};
+	flex-shrink: 0;
+	min-height: 200px;
 `;
 
 const AttractionName = styled.h2`
@@ -299,11 +389,22 @@ const InfoGrid = styled.div`
 	margin: ${theme.spacing.lg} 0;
 `;
 
-const InfoItem = styled.div`
+const InfoItem = styled(FlexibleContent)`
 	background: ${theme.colors.background};
 	padding: ${theme.spacing.sm};
 	border-radius: ${theme.borderRadius.md};
 	text-align: center;
+	flex-shrink: 1; /* Allow shrinking */
+	min-height: auto;
+	min-width: 0; /* Allow shrinking below content size */
+	width: 100%;
+	overflow: hidden; /* Prevent content overflow */
+
+	/* Responsive adjustments */
+	@media (max-width: ${theme.breakpoints.sm}) {
+		padding: ${theme.spacing.xs};
+		min-width: 0;
+	}
 `;
 
 const InfoLabel = styled.div`
@@ -311,16 +412,34 @@ const InfoLabel = styled.div`
 	font-size: 0.85rem;
 	font-weight: ${theme.typography.fontWeight.semibold};
 	margin-bottom: ${theme.spacing.xs};
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	/* Responsive font size */
+	@media (max-width: ${theme.breakpoints.sm}) {
+		font-size: 0.75rem;
+	}
 `;
 
 const InfoValue = styled.div`
 	color: ${theme.colors.textPrimary};
 	font-weight: ${theme.typography.fontWeight.bold};
 	font-size: 1rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	/* Responsive font size */
+	@media (max-width: ${theme.breakpoints.sm}) {
+		font-size: 0.9rem;
+	}
 `;
 
-const Section = styled.div`
+const Section = styled(FlexibleContent)`
 	margin: ${theme.spacing.lg} 0;
+	flex-shrink: 0;
+	min-height: auto;
 `;
 
 const SectionTitle = styled.h3`
@@ -357,17 +476,20 @@ const HighlightItem = styled.li`
 
 const TransportSection = styled.div`
 	background: ${theme.colors.background};
-	border-radius: ${theme.borderRadius.lg};
+	border-radius: ${theme.borderRadius.inner};
 	padding: ${theme.spacing.lg};
 	border-left: 4px solid ${theme.colors.secondary};
 	margin-top: ${theme.spacing.lg};
 `;
 
-const RouteSteps = styled.div`
+const RouteSteps = styled(FlexibleContent)`
 	display: flex;
+	flex-direction: row;
 	gap: ${theme.spacing.md};
 	overflow-x: auto;
+	overflow-y: hidden;
 	padding: ${theme.spacing.sm} 0;
+	min-height: 120px;
 
 	&::-webkit-scrollbar {
 		height: 6px;
@@ -1209,7 +1331,7 @@ const TripPlanPage: React.FC = () => {
 						}}
 					>
 						Click any step to view details. Current selection:{" "}
-						<strong>Step {selectedIndex}</strong>
+						<strong>Step {selectedIndex + 1}</strong>
 					</p>
 					<RouteSteps>
 						{currentTripData.attractions.map(

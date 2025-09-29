@@ -228,6 +228,19 @@ export const GlobalStyle = createGlobalStyle`
     border: 0;
   }
 
+  /* Prevent horizontal overflow globally */
+  html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  /* Ensure all elements respect container bounds */
+  * {
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
   /* Scrollbar Styling */
   ::-webkit-scrollbar {
     width: 8px;
@@ -466,4 +479,73 @@ export const Flex = styled.div<{
 	}};
 	gap: ${({ gap }) => gap || "0"};
 	${({ wrap }) => wrap && "flex-wrap: wrap;"}
+`;
+
+// Layout Overflow Prevention Components
+export const ResizableContainer = styled.div`
+	display: flex;
+	min-height: 0;
+	overflow: visible;
+	flex: 1;
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+
+	/* Ensure proper flex constraints for resizable layouts */
+	&.horizontal {
+		flex-direction: row;
+		flex-wrap: wrap;
+
+		@media (max-width: ${theme.breakpoints.md}) {
+			flex-direction: column;
+		}
+	}
+
+	&.vertical {
+		flex-direction: column;
+	}
+`;
+
+export const FlexibleContent = styled.div.withConfig({
+	shouldForwardProp: (prop) =>
+		!["minWidth", "maxWidth", "minHeight", "maxHeight"].includes(prop),
+})<{
+	minWidth?: string;
+	maxWidth?: string;
+	minHeight?: string;
+	maxHeight?: string;
+}>`
+	flex: 1 1 auto;
+	min-width: ${({ minWidth }) => minWidth || "0"};
+	max-width: ${({ maxWidth }) => maxWidth || "100%"};
+	min-height: ${({ minHeight }) => minHeight || "0"};
+	max-height: ${({ maxHeight }) => maxHeight || "none"};
+	overflow: visible;
+	width: 100%;
+	box-sizing: border-box;
+
+	/* Ensure content reflows properly during resizing */
+	display: flex;
+	flex-direction: column;
+
+	/* Prevent content from being clipped or obscured */
+	&.scrollable {
+		overflow-y: auto;
+		overflow-x: hidden;
+		max-height: ${({ maxHeight }) => maxHeight || "70vh"};
+	}
+
+	&.no-shrink {
+		flex-shrink: 0;
+	}
+
+	/* Force content to wrap and not overflow */
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+
+	/* Ensure all child elements respect container bounds */
+	> * {
+		max-width: 100%;
+		box-sizing: border-box;
+	}
 `;
