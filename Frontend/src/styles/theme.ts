@@ -322,7 +322,7 @@ export const Container = styled.div`
 
 export const Card = styled.div`
 	background: ${theme.colors.surface};
-	border-radius: ${theme.borderRadius.lg};
+	border-radius: ${theme.borderRadius.none};
 	box-shadow: ${theme.shadows.base};
 	padding: ${theme.spacing.lg};
 	transition: box-shadow 0.2s ease;
